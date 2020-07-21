@@ -28,6 +28,8 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
+
+
 //routes
 
 //1.récupération de tout les users
@@ -65,15 +67,29 @@ app.delete('/api/users/:id',(req,res)=>{
     connection.query(`delete from user where id=${req.params.id} `,(err,result)=>{
         if(err)
         throw err;
-        return res.send(result); 
+        return res.send("suppression réussi"); 
     })
 })
+
+const Validation=function(req,res,next){
+    const{nom,postnom,age}=req.body
+
+    if(!nom.length || !postnom.length || !age.length){
+        return res.status(400).send("tout les champs sont obligatoires");
+    }
+        else if(isNaN(age)){
+        return res.status(400).send("L'âge doit être un nombre");
+        }
+        next();
+    }
+
 //5.céartion d'un utilisateur
-app.post('/api/users',(req,res)=>{
+app.post('/api/users',Validation,(req,res)=>{
     connection.query(`insert into user(nom,postnom,age) values ("${req.body.nom}","${req.body.postnom}","${req.body.age}")`,(err,result)=>{
         if(err)
         throw err;
-        return res.send(result); 
+        return res.send("utilisateur ajouté avec succès"); 
+        
     })
 })
 
